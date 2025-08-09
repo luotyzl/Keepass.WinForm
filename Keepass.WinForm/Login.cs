@@ -17,7 +17,9 @@ public partial class Login : Form
             return;
         }
 
-        // TODO: Add actual password validation logic here
-        MessageBox.Show($"Password entered: {password.Length} characters", "Login", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        // Hide login form and show main form
+        this.Hide();
+        Main mainForm = new Main();
+        mainForm.Show();
     }
 }
