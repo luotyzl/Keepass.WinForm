@@ -1,0 +1,16 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Keepass.WinForm", "Keepass.WinForm\Keepass.WinForm.csproj", "{C9164DC2-28AD-4862-A7E6-E11002A89ACC}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{C9164DC2-28AD-4862-A7E6-E11002A89ACC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C9164DC2-28AD-4862-A7E6-E11002A89ACC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C9164DC2-28AD-4862-A7E6-E11002A89ACC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C9164DC2-28AD-4862-A7E6-E11002A89ACC}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
