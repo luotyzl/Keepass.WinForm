@@ -48,17 +48,18 @@ public partial class Main : Form
     {
         var sampleEntries = new[]
         {
-            new { Title = "Gmail", Username = "user@gmail.com", URL = "https://gmail.com", Modified = "2024-01-15" },
-            new { Title = "Facebook", Username = "myusername", URL = "https://facebook.com", Modified = "2024-01-10" },
-            new { Title = "GitHub", Username = "developer", URL = "https://github.com", Modified = "2024-01-20" },
-            new { Title = "Microsoft", Username = "work@company.com", URL = "https://microsoft.com", Modified = "2024-01-08" },
-            new { Title = "Banking", Username = "account123", URL = "https://mybank.com", Modified = "2024-01-12" },
-            new { Title = "Amazon", Username = "shopper", URL = "https://amazon.com", Modified = "2024-01-18" }
+            new { Title = "Gmail", Username = "user@gmail.com", URL = "https://gmail.com", Modified = "2024-01-15", Password = "mySecretPass123", Notes = "Personal email account for daily communication." },
+            new { Title = "Facebook", Username = "myusername", URL = "https://facebook.com", Modified = "2024-01-10", Password = "fb_secure456", Notes = "Social media account. Enable two-factor authentication." },
+            new { Title = "GitHub", Username = "developer", URL = "https://github.com", Modified = "2024-01-20", Password = "codeLife789", Notes = "Development platform for code repositories and collaboration." },
+            new { Title = "Microsoft", Username = "work@company.com", URL = "https://microsoft.com", Modified = "2024-01-08", Password = "workPass321", Notes = "Corporate Microsoft account for Office 365 and Azure services." },
+            new { Title = "Banking", Username = "account123", URL = "https://mybank.com", Modified = "2024-01-12", Password = "bank$ecure999", Notes = "Online banking account. Never share credentials. Use secure connection only." },
+            new { Title = "Amazon", Username = "shopper", URL = "https://amazon.com", Modified = "2024-01-18", Password = "shop2024!", Notes = "E-commerce account for online shopping. Saved payment methods available." }
         };
 
         foreach (var entry in sampleEntries)
         {
             var item = new ListViewItem(new[] { entry.Title, entry.Username, entry.URL, entry.Modified });
+            item.Tag = new { entry.Password, entry.Notes };
             allEntries.Add(item);
             entriesListView.Items.Add(item);
         }
@@ -77,7 +78,9 @@ public partial class Main : Form
         {
             foreach (var item in allEntries)
             {
-                entriesListView.Items.Add((ListViewItem)item.Clone());
+                var clonedItem = (ListViewItem)item.Clone();
+                clonedItem.Tag = item.Tag;
+                entriesListView.Items.Add(clonedItem);
             }
         }
         else
@@ -90,8 +93,51 @@ public partial class Main : Form
 
             foreach (var item in filteredEntries)
             {
-                entriesListView.Items.Add((ListViewItem)item.Clone());
+                var clonedItem = (ListViewItem)item.Clone();
+                clonedItem.Tag = item.Tag;
+                entriesListView.Items.Add(clonedItem);
             }
         }
+    }
+
+    private void entriesListView_SelectedIndexChanged(object sender, EventArgs e)
+    {
+        if (entriesListView.SelectedItems.Count > 0)
+        {
+            var selectedItem = entriesListView.SelectedItems[0];
+            ShowEntryDetails(selectedItem);
+        }
+        else
+        {
+            ClearEntryDetails();
+        }
+    }
+
+    private void ShowEntryDetails(ListViewItem item)
+    {
+        titleTextBox.Text = item.SubItems[0].Text;
+        usernameTextBox.Text = item.SubItems[1].Text;
+        urlTextBox.Text = item.SubItems[2].Text;
+
+        if (item.Tag != null)
+        {
+            dynamic tagData = item.Tag;
+            passwordTextBox.Text = tagData.Password;
+            notesTextBox.Text = tagData.Notes;
+        }
+        else
+        {
+            passwordTextBox.Text = "";
+            notesTextBox.Text = "";
+        }
+    }
+
+    private void ClearEntryDetails()
+    {
+        titleTextBox.Text = "";
+        usernameTextBox.Text = "";
+        passwordTextBox.Text = "";
+        urlTextBox.Text = "";
+        notesTextBox.Text = "";
     }
 }
