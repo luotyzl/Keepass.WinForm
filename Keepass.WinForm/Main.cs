@@ -2,7 +2,7 @@ namespace Keepass.WinForm;
 
 public partial class Main : Form
 {
-    private List<ListViewItem> allEntries;
+    private List<ListViewItem> allEntries = new List<ListViewItem>();
 
     public Main()
     {
@@ -40,8 +40,6 @@ public partial class Main : Form
         
         entriesListView.FullRowSelect = true;
         entriesListView.GridLines = true;
-        
-        allEntries = new List<ListViewItem>();
     }
 
     private void LoadSampleData()
