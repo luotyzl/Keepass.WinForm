@@ -140,4 +140,84 @@ public partial class Main : Form
         urlTextBox.Text = "";
         notesTextBox.Text = "";
     }
+
+    private void searchIcon_Paint(object sender, PaintEventArgs e)
+    {
+        var g = e.Graphics;
+        g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
+        
+        // Draw search magnifying glass
+        using (var pen = new Pen(Color.Gray, 2))
+        {
+            // Draw circle (magnifying glass)
+            g.DrawEllipse(pen, 2, 2, 10, 10);
+            // Draw handle
+            g.DrawLine(pen, 10, 10, 16, 16);
+        }
+    }
+
+    private void searchIcon_Click(object sender, EventArgs e)
+    {
+        throw new System.NotImplementedException();
+    }
+
+    private void Main_FormClosing(object sender, FormClosingEventArgs e)
+    {
+        if (e.CloseReason == CloseReason.UserClosing)
+        {
+            e.Cancel = true;
+            Hide();
+            notifyIcon.ShowBalloonTip(2000, "KeeZ", "Application minimized to tray", ToolTipIcon.Info);
+        }
+    }
+
+    private void Main_Resize(object sender, EventArgs e)
+    {
+        if (WindowState == FormWindowState.Minimized)
+        {
+            Hide();
+            notifyIcon.ShowBalloonTip(2000, "KeeZ", "Application minimized to tray", ToolTipIcon.Info);
+        }
+    }
+
+    private void notifyIcon_MouseClick(object sender, MouseEventArgs e)
+    {
+        if (e.Button == MouseButtons.Left)
+        {
+            RestoreFromTray();
+        }
+    }
+
+    private void notifyIcon_DoubleClick(object sender, EventArgs e)
+    {
+        RestoreFromTray();
+    }
+
+    private void showToolStripMenuItem_Click(object sender, EventArgs e)
+    {
+        RestoreFromTray();
+    }
+
+    private void exitToolStripMenuItem_Click(object sender, EventArgs e)
+    {
+        notifyIcon.Visible = false;
+        Application.Exit();
+    }
+
+    private void RestoreFromTray()
+    {
+        Show();
+        WindowState = FormWindowState.Normal;
+        BringToFront();
+        Focus();
+    }
+
+    protected override void SetVisibleCore(bool value)
+    {
+        base.SetVisibleCore(value);
+        if (!value && !IsHandleCreated)
+        {
+            CreateHandle();
+        }
+    }
 }

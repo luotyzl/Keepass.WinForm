@@ -24,6 +24,8 @@ partial class Main
     private System.Windows.Forms.ListView entriesListView;
     private System.Windows.Forms.Panel detailsPanel;
     private System.Windows.Forms.Panel centerPanel;
+    private System.Windows.Forms.Panel searchPanel;
+    private System.Windows.Forms.PictureBox searchIcon;
     private System.Windows.Forms.TextBox searchTextBox;
     private System.Windows.Forms.Splitter splitter1;
     private System.Windows.Forms.Splitter splitter2;
@@ -38,6 +40,10 @@ partial class Main
     private System.Windows.Forms.TextBox urlTextBox;
     private System.Windows.Forms.Label notesLabel;
     private System.Windows.Forms.TextBox notesTextBox;
+    private System.Windows.Forms.NotifyIcon notifyIcon;
+    private System.Windows.Forms.ContextMenuStrip trayContextMenu;
+    private System.Windows.Forms.ToolStripMenuItem showToolStripMenuItem;
+    private System.Windows.Forms.ToolStripMenuItem exitToolStripMenuItem;
 
     #region Windows Form Designer generated code
 
@@ -47,220 +53,307 @@ partial class Main
     /// </summary>
     private void InitializeComponent()
     {
-        this.groupsTreeView = new System.Windows.Forms.TreeView();
-        this.entriesListView = new System.Windows.Forms.ListView();
-        this.detailsPanel = new System.Windows.Forms.Panel();
-        this.centerPanel = new System.Windows.Forms.Panel();
-        this.searchTextBox = new System.Windows.Forms.TextBox();
-        this.splitter1 = new System.Windows.Forms.Splitter();
-        this.splitter2 = new System.Windows.Forms.Splitter();
-        this.detailsTitleLabel = new System.Windows.Forms.Label();
-        this.titleLabel = new System.Windows.Forms.Label();
-        this.titleTextBox = new System.Windows.Forms.TextBox();
-        this.usernameLabel = new System.Windows.Forms.Label();
-        this.usernameTextBox = new System.Windows.Forms.TextBox();
-        this.passwordLabel = new System.Windows.Forms.Label();
-        this.passwordTextBox = new System.Windows.Forms.TextBox();
-        this.urlLabel = new System.Windows.Forms.Label();
-        this.urlTextBox = new System.Windows.Forms.TextBox();
-        this.notesLabel = new System.Windows.Forms.Label();
-        this.notesTextBox = new System.Windows.Forms.TextBox();
-        this.centerPanel.SuspendLayout();
-        this.detailsPanel.SuspendLayout();
-        this.SuspendLayout();
+        System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Main));
+        trayContextMenu = new System.Windows.Forms.ContextMenuStrip();
+        showToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+        exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+        groupsTreeView = new System.Windows.Forms.TreeView();
+        notifyIcon = new System.Windows.Forms.NotifyIcon();
+        entriesListView = new System.Windows.Forms.ListView();
+        detailsPanel = new System.Windows.Forms.Panel();
+        notesTextBox = new System.Windows.Forms.TextBox();
+        notesLabel = new System.Windows.Forms.Label();
+        urlTextBox = new System.Windows.Forms.TextBox();
+        urlLabel = new System.Windows.Forms.Label();
+        passwordTextBox = new System.Windows.Forms.TextBox();
+        passwordLabel = new System.Windows.Forms.Label();
+        usernameTextBox = new System.Windows.Forms.TextBox();
+        usernameLabel = new System.Windows.Forms.Label();
+        titleTextBox = new System.Windows.Forms.TextBox();
+        titleLabel = new System.Windows.Forms.Label();
+        detailsTitleLabel = new System.Windows.Forms.Label();
+        centerPanel = new System.Windows.Forms.Panel();
+        searchPanel = new System.Windows.Forms.Panel();
+        searchTextBox = new System.Windows.Forms.TextBox();
+        searchIcon = new System.Windows.Forms.PictureBox();
+        splitter1 = new System.Windows.Forms.Splitter();
+        splitter2 = new System.Windows.Forms.Splitter();
+        trayContextMenu.SuspendLayout();
+        detailsPanel.SuspendLayout();
+        centerPanel.SuspendLayout();
+        searchPanel.SuspendLayout();
+        ((System.ComponentModel.ISupportInitialize)searchIcon).BeginInit();
+        SuspendLayout();
         // 
         // groupsTreeView
         // 
-        this.groupsTreeView.Dock = System.Windows.Forms.DockStyle.Left;
-        this.groupsTreeView.Location = new System.Drawing.Point(0, 0);
-        this.groupsTreeView.Name = "groupsTreeView";
-        this.groupsTreeView.Size = new System.Drawing.Size(200, 600);
-        this.groupsTreeView.TabIndex = 0;
+        groupsTreeView.Dock = System.Windows.Forms.DockStyle.Left;
+        groupsTreeView.Location = new System.Drawing.Point(0, 0);
+        groupsTreeView.Margin = new System.Windows.Forms.Padding(4);
+        groupsTreeView.Name = "groupsTreeView";
+        groupsTreeView.Size = new System.Drawing.Size(256, 800);
+        groupsTreeView.TabIndex = 0;
         // 
-        // splitter1
+        // trayContextMenu
         // 
-        this.splitter1.Location = new System.Drawing.Point(200, 0);
-        this.splitter1.Name = "splitter1";
-        this.splitter1.Size = new System.Drawing.Size(3, 600);
-        this.splitter1.TabIndex = 1;
-        this.splitter1.TabStop = false;
+        trayContextMenu.ImageScalingSize = new System.Drawing.Size(20, 20);
+        trayContextMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] { showToolStripMenuItem, exitToolStripMenuItem });
+        trayContextMenu.Name = "trayContextMenu";
+        trayContextMenu.Size = new System.Drawing.Size(113, 52);
         // 
-        // centerPanel
+        // showToolStripMenuItem
         // 
-        this.centerPanel.Controls.Add(this.entriesListView);
-        this.centerPanel.Controls.Add(this.searchTextBox);
-        this.centerPanel.Dock = System.Windows.Forms.DockStyle.Fill;
-        this.centerPanel.Location = new System.Drawing.Point(203, 0);
-        this.centerPanel.Name = "centerPanel";
-        this.centerPanel.Size = new System.Drawing.Size(300, 600);
-        this.centerPanel.TabIndex = 5;
+        showToolStripMenuItem.Name = "showToolStripMenuItem";
+        showToolStripMenuItem.Size = new System.Drawing.Size(112, 24);
+        showToolStripMenuItem.Text = "Show";
+        showToolStripMenuItem.Click += showToolStripMenuItem_Click;
         // 
-        // searchTextBox
+        // exitToolStripMenuItem
         // 
-        this.searchTextBox.Dock = System.Windows.Forms.DockStyle.Top;
-        this.searchTextBox.Location = new System.Drawing.Point(0, 0);
-        this.searchTextBox.Name = "searchTextBox";
-        this.searchTextBox.PlaceholderText = "Search entries...";
-        this.searchTextBox.Size = new System.Drawing.Size(300, 23);
-        this.searchTextBox.TabIndex = 0;
-        this.searchTextBox.TextChanged += new System.EventHandler(this.searchTextBox_TextChanged);
+        exitToolStripMenuItem.Name = "exitToolStripMenuItem";
+        exitToolStripMenuItem.Size = new System.Drawing.Size(112, 24);
+        exitToolStripMenuItem.Text = "Exit";
+        exitToolStripMenuItem.Click += exitToolStripMenuItem_Click;
+        // 
+        // notifyIcon
+        // 
+        notifyIcon.ContextMenuStrip = trayContextMenu;
+        notifyIcon.Icon = ((System.Drawing.Icon)resources.GetObject("$this.Icon"));
+        notifyIcon.Text = "KeeZ - Password Manager";
+        notifyIcon.Visible = true;
+        notifyIcon.MouseClick += notifyIcon_MouseClick;
+        notifyIcon.DoubleClick += notifyIcon_DoubleClick;
         // 
         // entriesListView
         // 
-        this.entriesListView.Dock = System.Windows.Forms.DockStyle.Fill;
-        this.entriesListView.Location = new System.Drawing.Point(0, 23);
-        this.entriesListView.Name = "entriesListView";
-        this.entriesListView.Size = new System.Drawing.Size(300, 577);
-        this.entriesListView.TabIndex = 1;
-        this.entriesListView.UseCompatibleStateImageBehavior = false;
-        this.entriesListView.View = System.Windows.Forms.View.Details;
-        this.entriesListView.SelectedIndexChanged += new System.EventHandler(this.entriesListView_SelectedIndexChanged);
-        // 
-        // splitter2
-        // 
-        this.splitter2.Dock = System.Windows.Forms.DockStyle.Right;
-        this.splitter2.Location = new System.Drawing.Point(503, 0);
-        this.splitter2.Name = "splitter2";
-        this.splitter2.Size = new System.Drawing.Size(3, 600);
-        this.splitter2.TabIndex = 3;
-        this.splitter2.TabStop = false;
+        entriesListView.Dock = System.Windows.Forms.DockStyle.Fill;
+        entriesListView.Location = new System.Drawing.Point(0, 40);
+        entriesListView.Margin = new System.Windows.Forms.Padding(4);
+        entriesListView.Name = "entriesListView";
+        entriesListView.Size = new System.Drawing.Size(387, 760);
+        entriesListView.TabIndex = 1;
+        entriesListView.UseCompatibleStateImageBehavior = false;
+        entriesListView.View = System.Windows.Forms.View.Details;
+        entriesListView.SelectedIndexChanged += entriesListView_SelectedIndexChanged;
         // 
         // detailsPanel
         // 
-        this.detailsPanel.Controls.Add(this.notesTextBox);
-        this.detailsPanel.Controls.Add(this.notesLabel);
-        this.detailsPanel.Controls.Add(this.urlTextBox);
-        this.detailsPanel.Controls.Add(this.urlLabel);
-        this.detailsPanel.Controls.Add(this.passwordTextBox);
-        this.detailsPanel.Controls.Add(this.passwordLabel);
-        this.detailsPanel.Controls.Add(this.usernameTextBox);
-        this.detailsPanel.Controls.Add(this.usernameLabel);
-        this.detailsPanel.Controls.Add(this.titleTextBox);
-        this.detailsPanel.Controls.Add(this.titleLabel);
-        this.detailsPanel.Controls.Add(this.detailsTitleLabel);
-        this.detailsPanel.Dock = System.Windows.Forms.DockStyle.Right;
-        this.detailsPanel.Location = new System.Drawing.Point(506, 0);
-        this.detailsPanel.Name = "detailsPanel";
-        this.detailsPanel.Padding = new System.Windows.Forms.Padding(10);
-        this.detailsPanel.Size = new System.Drawing.Size(294, 600);
-        this.detailsPanel.TabIndex = 4;
-        // 
-        // detailsTitleLabel
-        // 
-        this.detailsTitleLabel.AutoSize = true;
-        this.detailsTitleLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
-        this.detailsTitleLabel.Location = new System.Drawing.Point(10, 10);
-        this.detailsTitleLabel.Name = "detailsTitleLabel";
-        this.detailsTitleLabel.Size = new System.Drawing.Size(103, 20);
-        this.detailsTitleLabel.TabIndex = 0;
-        this.detailsTitleLabel.Text = "Entry Details";
-        // 
-        // titleLabel
-        // 
-        this.titleLabel.AutoSize = true;
-        this.titleLabel.Location = new System.Drawing.Point(10, 50);
-        this.titleLabel.Name = "titleLabel";
-        this.titleLabel.Size = new System.Drawing.Size(32, 15);
-        this.titleLabel.TabIndex = 1;
-        this.titleLabel.Text = "Title:";
-        // 
-        // titleTextBox
-        // 
-        this.titleTextBox.Location = new System.Drawing.Point(10, 70);
-        this.titleTextBox.Name = "titleTextBox";
-        this.titleTextBox.ReadOnly = true;
-        this.titleTextBox.Size = new System.Drawing.Size(270, 23);
-        this.titleTextBox.TabIndex = 2;
-        // 
-        // usernameLabel
-        // 
-        this.usernameLabel.AutoSize = true;
-        this.usernameLabel.Location = new System.Drawing.Point(10, 110);
-        this.usernameLabel.Name = "usernameLabel";
-        this.usernameLabel.Size = new System.Drawing.Size(63, 15);
-        this.usernameLabel.TabIndex = 3;
-        this.usernameLabel.Text = "Username:";
-        // 
-        // usernameTextBox
-        // 
-        this.usernameTextBox.Location = new System.Drawing.Point(10, 130);
-        this.usernameTextBox.Name = "usernameTextBox";
-        this.usernameTextBox.ReadOnly = true;
-        this.usernameTextBox.Size = new System.Drawing.Size(270, 23);
-        this.usernameTextBox.TabIndex = 4;
-        // 
-        // passwordLabel
-        // 
-        this.passwordLabel.AutoSize = true;
-        this.passwordLabel.Location = new System.Drawing.Point(10, 170);
-        this.passwordLabel.Name = "passwordLabel";
-        this.passwordLabel.Size = new System.Drawing.Size(60, 15);
-        this.passwordLabel.TabIndex = 5;
-        this.passwordLabel.Text = "Password:";
-        // 
-        // passwordTextBox
-        // 
-        this.passwordTextBox.Location = new System.Drawing.Point(10, 190);
-        this.passwordTextBox.Name = "passwordTextBox";
-        this.passwordTextBox.PasswordChar = '*';
-        this.passwordTextBox.ReadOnly = true;
-        this.passwordTextBox.Size = new System.Drawing.Size(270, 23);
-        this.passwordTextBox.TabIndex = 6;
-        // 
-        // urlLabel
-        // 
-        this.urlLabel.AutoSize = true;
-        this.urlLabel.Location = new System.Drawing.Point(10, 230);
-        this.urlLabel.Name = "urlLabel";
-        this.urlLabel.Size = new System.Drawing.Size(31, 15);
-        this.urlLabel.TabIndex = 7;
-        this.urlLabel.Text = "URL:";
-        // 
-        // urlTextBox
-        // 
-        this.urlTextBox.Location = new System.Drawing.Point(10, 250);
-        this.urlTextBox.Name = "urlTextBox";
-        this.urlTextBox.ReadOnly = true;
-        this.urlTextBox.Size = new System.Drawing.Size(270, 23);
-        this.urlTextBox.TabIndex = 8;
-        // 
-        // notesLabel
-        // 
-        this.notesLabel.AutoSize = true;
-        this.notesLabel.Location = new System.Drawing.Point(10, 290);
-        this.notesLabel.Name = "notesLabel";
-        this.notesLabel.Size = new System.Drawing.Size(41, 15);
-        this.notesLabel.TabIndex = 9;
-        this.notesLabel.Text = "Notes:";
+        detailsPanel.Controls.Add(notesTextBox);
+        detailsPanel.Controls.Add(notesLabel);
+        detailsPanel.Controls.Add(urlTextBox);
+        detailsPanel.Controls.Add(urlLabel);
+        detailsPanel.Controls.Add(passwordTextBox);
+        detailsPanel.Controls.Add(passwordLabel);
+        detailsPanel.Controls.Add(usernameTextBox);
+        detailsPanel.Controls.Add(usernameLabel);
+        detailsPanel.Controls.Add(titleTextBox);
+        detailsPanel.Controls.Add(titleLabel);
+        detailsPanel.Controls.Add(detailsTitleLabel);
+        detailsPanel.Dock = System.Windows.Forms.DockStyle.Right;
+        detailsPanel.Location = new System.Drawing.Point(651, 0);
+        detailsPanel.Margin = new System.Windows.Forms.Padding(4);
+        detailsPanel.Name = "detailsPanel";
+        detailsPanel.Padding = new System.Windows.Forms.Padding(13);
+        detailsPanel.Size = new System.Drawing.Size(378, 800);
+        detailsPanel.TabIndex = 4;
         // 
         // notesTextBox
         // 
-        this.notesTextBox.Location = new System.Drawing.Point(10, 310);
-        this.notesTextBox.Multiline = true;
-        this.notesTextBox.Name = "notesTextBox";
-        this.notesTextBox.ReadOnly = true;
-        this.notesTextBox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-        this.notesTextBox.Size = new System.Drawing.Size(270, 100);
-        this.notesTextBox.TabIndex = 10;
+        notesTextBox.Location = new System.Drawing.Point(13, 413);
+        notesTextBox.Margin = new System.Windows.Forms.Padding(4);
+        notesTextBox.Multiline = true;
+        notesTextBox.Name = "notesTextBox";
+        notesTextBox.ReadOnly = true;
+        notesTextBox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+        notesTextBox.Size = new System.Drawing.Size(346, 132);
+        notesTextBox.TabIndex = 10;
+        // 
+        // notesLabel
+        // 
+        notesLabel.AutoSize = true;
+        notesLabel.Location = new System.Drawing.Point(13, 387);
+        notesLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+        notesLabel.Name = "notesLabel";
+        notesLabel.Size = new System.Drawing.Size(57, 20);
+        notesLabel.TabIndex = 9;
+        notesLabel.Text = "Notes:";
+        // 
+        // urlTextBox
+        // 
+        urlTextBox.Location = new System.Drawing.Point(13, 333);
+        urlTextBox.Margin = new System.Windows.Forms.Padding(4);
+        urlTextBox.Name = "urlTextBox";
+        urlTextBox.ReadOnly = true;
+        urlTextBox.Size = new System.Drawing.Size(346, 27);
+        urlTextBox.TabIndex = 8;
+        // 
+        // urlLabel
+        // 
+        urlLabel.AutoSize = true;
+        urlLabel.Location = new System.Drawing.Point(13, 307);
+        urlLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+        urlLabel.Name = "urlLabel";
+        urlLabel.Size = new System.Drawing.Size(42, 20);
+        urlLabel.TabIndex = 7;
+        urlLabel.Text = "URL:";
+        // 
+        // passwordTextBox
+        // 
+        passwordTextBox.Location = new System.Drawing.Point(13, 253);
+        passwordTextBox.Margin = new System.Windows.Forms.Padding(4);
+        passwordTextBox.Name = "passwordTextBox";
+        passwordTextBox.PasswordChar = '*';
+        passwordTextBox.ReadOnly = true;
+        passwordTextBox.Size = new System.Drawing.Size(346, 27);
+        passwordTextBox.TabIndex = 6;
+        // 
+        // passwordLabel
+        // 
+        passwordLabel.AutoSize = true;
+        passwordLabel.Location = new System.Drawing.Point(13, 227);
+        passwordLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+        passwordLabel.Name = "passwordLabel";
+        passwordLabel.Size = new System.Drawing.Size(82, 20);
+        passwordLabel.TabIndex = 5;
+        passwordLabel.Text = "Password:";
+        // 
+        // usernameTextBox
+        // 
+        usernameTextBox.Location = new System.Drawing.Point(13, 173);
+        usernameTextBox.Margin = new System.Windows.Forms.Padding(4);
+        usernameTextBox.Name = "usernameTextBox";
+        usernameTextBox.ReadOnly = true;
+        usernameTextBox.Size = new System.Drawing.Size(346, 27);
+        usernameTextBox.TabIndex = 4;
+        // 
+        // usernameLabel
+        // 
+        usernameLabel.AutoSize = true;
+        usernameLabel.Location = new System.Drawing.Point(13, 147);
+        usernameLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+        usernameLabel.Name = "usernameLabel";
+        usernameLabel.Size = new System.Drawing.Size(86, 20);
+        usernameLabel.TabIndex = 3;
+        usernameLabel.Text = "Username:";
+        // 
+        // titleTextBox
+        // 
+        titleTextBox.Location = new System.Drawing.Point(13, 93);
+        titleTextBox.Margin = new System.Windows.Forms.Padding(4);
+        titleTextBox.Name = "titleTextBox";
+        titleTextBox.ReadOnly = true;
+        titleTextBox.Size = new System.Drawing.Size(346, 27);
+        titleTextBox.TabIndex = 2;
+        // 
+        // titleLabel
+        // 
+        titleLabel.AutoSize = true;
+        titleLabel.Location = new System.Drawing.Point(13, 67);
+        titleLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+        titleLabel.Name = "titleLabel";
+        titleLabel.Size = new System.Drawing.Size(45, 20);
+        titleLabel.TabIndex = 1;
+        titleLabel.Text = "Title:";
+        // 
+        // detailsTitleLabel
+        // 
+        detailsTitleLabel.AutoSize = true;
+        detailsTitleLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold);
+        detailsTitleLabel.Location = new System.Drawing.Point(13, 13);
+        detailsTitleLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+        detailsTitleLabel.Name = "detailsTitleLabel";
+        detailsTitleLabel.Size = new System.Drawing.Size(134, 25);
+        detailsTitleLabel.TabIndex = 0;
+        detailsTitleLabel.Text = "Entry Details";
+        // 
+        // centerPanel
+        // 
+        centerPanel.Controls.Add(entriesListView);
+        centerPanel.Controls.Add(searchPanel);
+        centerPanel.Dock = System.Windows.Forms.DockStyle.Fill;
+        centerPanel.Location = new System.Drawing.Point(260, 0);
+        centerPanel.Margin = new System.Windows.Forms.Padding(4);
+        centerPanel.Name = "centerPanel";
+        centerPanel.Size = new System.Drawing.Size(387, 800);
+        centerPanel.TabIndex = 5;
+        // 
+        // searchPanel
+        // 
+        searchPanel.Controls.Add(searchTextBox);
+        searchPanel.Controls.Add(searchIcon);
+        searchPanel.Dock = System.Windows.Forms.DockStyle.Top;
+        searchPanel.Location = new System.Drawing.Point(0, 0);
+        searchPanel.Margin = new System.Windows.Forms.Padding(4);
+        searchPanel.Name = "searchPanel";
+        searchPanel.Size = new System.Drawing.Size(387, 40);
+        searchPanel.TabIndex = 0;
+        // 
+        // searchTextBox
+        // 
+        searchTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) | System.Windows.Forms.AnchorStyles.Right));
+        searchTextBox.Location = new System.Drawing.Point(39, 5);
+        searchTextBox.Margin = new System.Windows.Forms.Padding(4);
+        searchTextBox.Name = "searchTextBox";
+        searchTextBox.PlaceholderText = "Search entries...";
+        searchTextBox.Size = new System.Drawing.Size(341, 27);
+        searchTextBox.TabIndex = 0;
+        searchTextBox.TextChanged += searchTextBox_TextChanged;
+        // 
+        // searchIcon
+        // 
+        searchIcon.BackColor = System.Drawing.Color.Transparent;
+        searchIcon.Location = new System.Drawing.Point(6, 7);
+        searchIcon.Margin = new System.Windows.Forms.Padding(4);
+        searchIcon.Name = "searchIcon";
+        searchIcon.Size = new System.Drawing.Size(26, 27);
+        searchIcon.TabIndex = 1;
+        searchIcon.TabStop = false;
+        searchIcon.Click += searchIcon_Click;
+        searchIcon.Paint += searchIcon_Paint;
+        // 
+        // splitter1
+        // 
+        splitter1.Location = new System.Drawing.Point(256, 0);
+        splitter1.Margin = new System.Windows.Forms.Padding(4);
+        splitter1.Name = "splitter1";
+        splitter1.Size = new System.Drawing.Size(4, 800);
+        splitter1.TabIndex = 1;
+        splitter1.TabStop = false;
+        // 
+        // splitter2
+        // 
+        splitter2.Dock = System.Windows.Forms.DockStyle.Right;
+        splitter2.Location = new System.Drawing.Point(647, 0);
+        splitter2.Margin = new System.Windows.Forms.Padding(4);
+        splitter2.Name = "splitter2";
+        splitter2.Size = new System.Drawing.Size(4, 800);
+        splitter2.TabIndex = 3;
+        splitter2.TabStop = false;
         // 
         // Main
         // 
-        this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
-        this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-        this.ClientSize = new System.Drawing.Size(800, 600);
-        this.Controls.Add(this.centerPanel);
-        this.Controls.Add(this.splitter2);
-        this.Controls.Add(this.detailsPanel);
-        this.Controls.Add(this.splitter1);
-        this.Controls.Add(this.groupsTreeView);
-        this.Name = "Main";
-        this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-        this.Text = "Main";
-        this.centerPanel.ResumeLayout(false);
-        this.centerPanel.PerformLayout();
-        this.detailsPanel.ResumeLayout(false);
-        this.detailsPanel.PerformLayout();
-        this.ResumeLayout(false);
+        AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
+        AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+        ClientSize = new System.Drawing.Size(1029, 800);
+        Controls.Add(centerPanel);
+        Controls.Add(splitter2);
+        Controls.Add(detailsPanel);
+        Controls.Add(splitter1);
+        Controls.Add(groupsTreeView);
+        Icon = ((System.Drawing.Icon)resources.GetObject("$this.Icon"));
+        Margin = new System.Windows.Forms.Padding(4);
+        StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
+        Text = "KeeZ";
+        FormClosing += Main_FormClosing;
+        Resize += Main_Resize;
+        trayContextMenu.ResumeLayout(false);
+        detailsPanel.ResumeLayout(false);
+        detailsPanel.PerformLayout();
+        centerPanel.ResumeLayout(false);
+        searchPanel.ResumeLayout(false);
+        searchPanel.PerformLayout();
+        ((System.ComponentModel.ISupportInitialize)searchIcon).EndInit();
+        ResumeLayout(false);
     }
 
     #endregion

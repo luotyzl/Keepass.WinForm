@@ -50,8 +50,7 @@ public partial class Login : Form
 
         if (webDavConfig != null)
         {
-            MessageBox.Show($"WebDAV Config Loaded:\nURL: {webDavConfig.Url}\nUsername: {webDavConfig.Username}\nDatabase Path: {webDavConfig.DatabasePath}", 
-                "WebDAV Configuration", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            
         }
         else
         {
