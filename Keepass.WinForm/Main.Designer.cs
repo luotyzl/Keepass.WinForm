@@ -118,7 +118,7 @@ partial class Main
         // notifyIcon
         // 
         notifyIcon.ContextMenuStrip = trayContextMenu;
-        notifyIcon.Icon = ((System.Drawing.Icon)resources.GetObject("$this.Icon"));
+        notifyIcon.Icon = new System.Drawing.Icon("favicon.ico");
         notifyIcon.Text = "KeeZ - Password Manager";
         notifyIcon.Visible = true;
         notifyIcon.MouseClick += notifyIcon_MouseClick;
@@ -340,7 +340,7 @@ partial class Main
         Controls.Add(detailsPanel);
         Controls.Add(splitter1);
         Controls.Add(groupsTreeView);
-        Icon = ((System.Drawing.Icon)resources.GetObject("$this.Icon"));
+        Icon = new System.Drawing.Icon("favicon.ico");
         Margin = new System.Windows.Forms.Padding(4);
         StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
         Text = "KeeZ";
