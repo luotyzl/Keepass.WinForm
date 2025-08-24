@@ -10,7 +10,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="KeePassLib" Version="2.30.0" />
       <PackageReference Include="Microsoft.Windows.Compatibility" Version="9.0.8" />
       <PackageReference Include="Serilog" Version="4.3.0" />
       <PackageReference Include="Serilog.Sinks.File" Version="7.0.0" />
@@ -21,6 +20,10 @@
       <Content Include="favicon.ico">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </Content>
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\pt.KeePassLibStd\pt.KeePassLibStd.csproj" />
     </ItemGroup>
 
 </Project>

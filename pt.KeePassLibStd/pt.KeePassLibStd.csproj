@@ -1,0 +1,29 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Version>2.50.0</Version>
+    <Authors>ArtjomP</Authors>
+    <Company>Panteam</Company>
+    <PackageTags>KeePass;KeePassLib;</PackageTags>
+    <AssemblyVersion>2.49.0.0</AssemblyVersion>
+    <FileVersion>2.49.0.0</FileVersion>
+    <Product>pt.KeePass</Product>
+    <Description>Unofficial port of KeePassLib to .NET Standard 2.0 offical KeePass project is here: https://keepass.info/</Description>
+    <PackageIconUrl>https://cdn2.iconfinder.com/data/icons/ecqlipse2/KEEPASS.png</PackageIconUrl>
+    <RepositoryUrl>https://github.com/AdminPanteam/pt.KeePassLibStd</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/AdminPanteam/pt.KeePass</PackageProjectUrl>
+    <PackageLicenseUrl>https://www.gnu.org/licenses/old-licenses/gpl-2.0.txt</PackageLicenseUrl>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DefineConstants>TRACE;DEBUG;NETSTANDARD2_0</DefineConstants>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="SkiaSharp" Version="3.119.0" />
+    <PackageReference Include="System.Security.Cryptography.ProtectedData" Version="9.0.8" />
+  </ItemGroup>
+
+</Project>
