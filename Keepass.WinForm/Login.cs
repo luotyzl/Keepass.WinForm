@@ -10,7 +10,7 @@ namespace Keepass.WinForm;
 
 public partial class Login : Form
 {
-    private UserConfig? _userConfig;
+    private UserConfig? m_userConfig;
     public PwDatabase? LoadedDatabase { get; private set; }
 
     public Login()
@@ -27,14 +27,15 @@ public partial class Login : Form
             if (File.Exists(configPath))
             {
                 string jsonContent = File.ReadAllText(configPath);
-                _userConfig = JsonSerializer.Deserialize<UserConfig>(jsonContent);
+                m_userConfig = JsonSerializer.Deserialize<UserConfig>(jsonContent);
             }
         }
         catch (Exception ex)
         {
-            MessageBox.Show($"Error loading config: {ex.Message}", "Configuration Error", 
-                MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            ShowErrorMessage($"Error loading config: {ex.Message}");
         }
+        
+        UpdateDatabaseFileDisplay();
     }
 
     public class UserConfig
@@ -53,56 +54,50 @@ public partial class Login : Form
 
     private async void loginButton_Click(object sender, EventArgs e)
     {
-        string password = passwordTextBox.Text;
+        HideErrorMessage();
         
+        string password = passwordTextBox.Text;
+        if (m_userConfig == null)
+        {
+            ShowErrorMessage("No configuration found. Please check settings.");
+            return;
+        }
         if (string.IsNullOrEmpty(password))
         {
-            MessageBox.Show("Please enter a password.", "Login", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            ShowErrorMessage("Please enter a password.");
             return;
         }
 
-        if (_userConfig != null)
+        var canOpenDb = false;
+        if (!string.IsNullOrEmpty(m_userConfig.LocalDatabasePath))
+            canOpenDb = LoadKdbxFromLocalPath(password);
+        else if (m_userConfig.WebDavConfiguration != null)
+            canOpenDb = await LoadKdbxFromWebDav(password);
+
+        if (canOpenDb && LoadedDatabase != null)
         {
-            if (!string.IsNullOrEmpty(_userConfig.LocalDatabasePath))
-            {
-                await LoadKdbxFromLocalPath(password);
-            }
-            else if (_userConfig.WebDavConfiguration != null)
-            {
-                await LoadKdbxFromWebDav(password);
-            }
-            else
-            {
-                MessageBox.Show("No database configuration found.", "Configuration", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-            }
-        }
-        else
-        {
-            MessageBox.Show("No configuration found.", "Configuration", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            // Hide login form and show main form with loaded database
+            this.Hide();
+            Main mainForm = new Main(LoadedDatabase);
+            mainForm.Show();
         }
 
-        // Hide login form and show main form
-        this.Hide();
-        Main mainForm = new Main();
-        mainForm.Show();
     }
 
-    private async Task LoadKdbxFromLocalPath(string password)
+    private bool LoadKdbxFromLocalPath(string password)
     {
         try
         {
-            if (string.IsNullOrEmpty(_userConfig?.LocalDatabasePath))
+            if (string.IsNullOrEmpty(m_userConfig?.LocalDatabasePath))
             {
-                MessageBox.Show("Local database path is not configured.", "Configuration Error", 
-                    MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return;
+                ShowErrorMessage("Local database path is not configured.");
+                return false;
             }
 
-            if (!File.Exists(_userConfig.LocalDatabasePath))
+            if (!File.Exists(m_userConfig.LocalDatabasePath))
             {
-                MessageBox.Show($"Database file not found: {_userConfig.LocalDatabasePath}", "File Error", 
-                    MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return;
+                ShowErrorMessage($"Database file not found: {m_userConfig.LocalDatabasePath}");
+                return false;
             }
 
             // Load the KeePass database from local file
@@ -112,35 +107,30 @@ public partial class Login : Form
 
             var ioConnectionInfo = new IOConnectionInfo()
             {
-                Path = _userConfig.LocalDatabasePath,
+                Path = m_userConfig.LocalDatabasePath,
                 CredSaveMode = IOCredSaveMode.NoSave
             };
 
-            await Task.Run(() =>
-            {
-                LoadedDatabase.Open(ioConnectionInfo, key, null);
-            });
+            LoadedDatabase.Open(ioConnectionInfo, key, null);
 
-            MessageBox.Show("Database loaded successfully from local path!", "Success", 
-                MessageBoxButtons.OK, MessageBoxIcon.Information);
+            return true;
         }
         catch (Exception ex)
         {
-            MessageBox.Show($"Error loading database from local path: {ex.Message}", "Load Error", 
-                MessageBoxButtons.OK, MessageBoxIcon.Error);
+            ShowErrorMessage($"Error loading database: {ex.Message}");
+            return false;
         }
     }
 
-    private async Task LoadKdbxFromWebDav(string password)
+    private async Task<bool> LoadKdbxFromWebDav(string password)
     {
         try
         {
-            var webDavConfig = _userConfig?.WebDavConfiguration;
+            var webDavConfig = m_userConfig?.WebDavConfiguration;
             if (webDavConfig?.Url == null || webDavConfig?.DatabasePath == null)
             {
-                MessageBox.Show("WebDAV configuration is incomplete.", "Configuration Error", 
-                    MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return;
+                ShowErrorMessage("WebDAV configuration is incomplete.");
+                return false;
             }
 
             // Create WebDAV client
@@ -172,26 +162,26 @@ public partial class Login : Form
             };
             
             // Use KdbxFile to load from stream
-            var kdbxFile = new KeePassLib.Serialization.KdbxFile(LoadedDatabase);
-            kdbxFile.Load(memoryStream, KeePassLib.Serialization.KdbxFormat.Default, null);
-
-            MessageBox.Show("Database loaded successfully from WebDAV!", "Success", 
-                MessageBoxButtons.OK, MessageBoxIcon.Information);
+            var kdbxFile = new KdbxFile(LoadedDatabase);
+            kdbxFile.Load(memoryStream, KdbxFormat.Default, null);
+            
+            return true;
         }
         catch (Exception ex)
         {
-            MessageBox.Show($"Error loading database from WebDAV: {ex.Message}", "WebDAV Error", 
-                MessageBoxButtons.OK, MessageBoxIcon.Error);
+            ShowErrorMessage($"Error loading database from WebDAV: {ex.Message}");
+            return false;
         }
     }
 
     private void settingsButton_Click(object sender, EventArgs e)
     {
-        var settingsForm = new SettingsForm(_userConfig);
+        var settingsForm = new SettingsForm(m_userConfig);
         if (settingsForm.ShowDialog() == DialogResult.OK)
         {
-            _userConfig = settingsForm.UserConfig;
+            m_userConfig = settingsForm.UserConfig;
             SaveUserConfig();
+            UpdateDatabaseFileDisplay();
         }
     }
 
@@ -200,13 +190,79 @@ public partial class Login : Form
         try
         {
             string configPath = @"C:\temp\config.json";
-            string jsonContent = JsonSerializer.Serialize(_userConfig, new JsonSerializerOptions { WriteIndented = true });
+            string jsonContent = JsonSerializer.Serialize(m_userConfig, new JsonSerializerOptions { WriteIndented = true });
             File.WriteAllText(configPath, jsonContent);
         }
         catch (Exception ex)
         {
-            MessageBox.Show($"Error saving config: {ex.Message}", "Configuration Error", 
-                MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            ShowErrorMessage($"Error saving config: {ex.Message}");
+        }
+    }
+
+    private void passwordTextBox_KeyDown(object sender, KeyEventArgs e)
+    {
+        if (e.KeyCode == Keys.Enter)
+        {
+            e.Handled = true;
+            loginButton_Click(sender, e);
+        }
+    }
+
+    private void passwordTextBox_TextChanged(object sender, EventArgs e)
+    {
+        HideErrorMessage();
+    }
+
+    private void ShowErrorMessage(string message)
+    {
+        errorMessageLabel.Text = message;
+        errorMessageLabel.Visible = true;
+    }
+
+    private void HideErrorMessage()
+    {
+        errorMessageLabel.Visible = false;
+        errorMessageLabel.Text = string.Empty;
+    }
+
+    private void UpdateDatabaseFileDisplay()
+    {
+        if (m_userConfig == null)
+        {
+            databaseFileLabel.Text = @"No database configured";
+            return;
+        }
+
+        if (!string.IsNullOrEmpty(m_userConfig.LocalDatabasePath))
+        {
+            string fileName = Path.GetFileName(m_userConfig.LocalDatabasePath);
+            databaseFileLabel.Text = $@"Local: {fileName}";
+        }
+        else if (m_userConfig.WebDavConfiguration?.DatabasePath != null)
+        {
+            string fileName = Path.GetFileName(m_userConfig.WebDavConfiguration.DatabasePath);
+            string serverName = ExtractServerName(m_userConfig.WebDavConfiguration.Url);
+            databaseFileLabel.Text = $@"WebDAV ({serverName}): {fileName}";
+        }
+        else
+        {
+            databaseFileLabel.Text = @"No database file configured";
+        }
+    }
+
+    private string ExtractServerName(string? url)
+    {
+        if (string.IsNullOrEmpty(url))
+            return "Unknown";
+
+        try
+        {
+            var uri = new Uri(url);
+            return uri.Host;
+        }
+        catch
+        {
+            return "Unknown";
         }
     }
 }

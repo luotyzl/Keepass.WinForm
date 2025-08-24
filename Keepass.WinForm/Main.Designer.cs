@@ -53,12 +53,13 @@ partial class Main
     /// </summary>
     private void InitializeComponent()
     {
+        components = new System.ComponentModel.Container();
         System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Main));
-        trayContextMenu = new System.Windows.Forms.ContextMenuStrip();
+        trayContextMenu = new System.Windows.Forms.ContextMenuStrip(components);
         showToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
         exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
         groupsTreeView = new System.Windows.Forms.TreeView();
-        notifyIcon = new System.Windows.Forms.NotifyIcon();
+        notifyIcon = new System.Windows.Forms.NotifyIcon(components);
         entriesListView = new System.Windows.Forms.ListView();
         detailsPanel = new System.Windows.Forms.Panel();
         notesTextBox = new System.Windows.Forms.TextBox();
@@ -85,6 +86,29 @@ partial class Main
         ((System.ComponentModel.ISupportInitialize)searchIcon).BeginInit();
         SuspendLayout();
         // 
+        // trayContextMenu
+        // 
+        trayContextMenu.ImageScalingSize = new System.Drawing.Size(20, 20);
+        trayContextMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            showToolStripMenuItem, exitToolStripMenuItem
+        });
+        trayContextMenu.Name = "trayContextMenu";
+        trayContextMenu.Size = new System.Drawing.Size(119, 52);
+        // 
+        // showToolStripMenuItem
+        // 
+        showToolStripMenuItem.Name = "showToolStripMenuItem";
+        showToolStripMenuItem.Size = new System.Drawing.Size(118, 24);
+        showToolStripMenuItem.Text = "Show";
+        showToolStripMenuItem.Click += showToolStripMenuItem_Click;
+        // 
+        // exitToolStripMenuItem
+        // 
+        exitToolStripMenuItem.Name = "exitToolStripMenuItem";
+        exitToolStripMenuItem.Size = new System.Drawing.Size(118, 24);
+        exitToolStripMenuItem.Text = "Exit";
+        exitToolStripMenuItem.Click += exitToolStripMenuItem_Click;
+        // 
         // groupsTreeView
         // 
         groupsTreeView.Dock = System.Windows.Forms.DockStyle.Left;
@@ -93,36 +117,15 @@ partial class Main
         groupsTreeView.Name = "groupsTreeView";
         groupsTreeView.Size = new System.Drawing.Size(256, 800);
         groupsTreeView.TabIndex = 0;
-        // 
-        // trayContextMenu
-        // 
-        trayContextMenu.ImageScalingSize = new System.Drawing.Size(20, 20);
-        trayContextMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] { showToolStripMenuItem, exitToolStripMenuItem });
-        trayContextMenu.Name = "trayContextMenu";
-        trayContextMenu.Size = new System.Drawing.Size(113, 52);
-        // 
-        // showToolStripMenuItem
-        // 
-        showToolStripMenuItem.Name = "showToolStripMenuItem";
-        showToolStripMenuItem.Size = new System.Drawing.Size(112, 24);
-        showToolStripMenuItem.Text = "Show";
-        showToolStripMenuItem.Click += showToolStripMenuItem_Click;
-        // 
-        // exitToolStripMenuItem
-        // 
-        exitToolStripMenuItem.Name = "exitToolStripMenuItem";
-        exitToolStripMenuItem.Size = new System.Drawing.Size(112, 24);
-        exitToolStripMenuItem.Text = "Exit";
-        exitToolStripMenuItem.Click += exitToolStripMenuItem_Click;
+        groupsTreeView.AfterSelect += groupsTreeView_AfterSelect;
         // 
         // notifyIcon
         // 
         notifyIcon.ContextMenuStrip = trayContextMenu;
-        notifyIcon.Icon = new System.Drawing.Icon("favicon.ico");
         notifyIcon.Text = "KeeZ - Password Manager";
         notifyIcon.Visible = true;
-        notifyIcon.MouseClick += notifyIcon_MouseClick;
         notifyIcon.DoubleClick += notifyIcon_DoubleClick;
+        notifyIcon.MouseClick += notifyIcon_MouseClick;
         // 
         // entriesListView
         // 
@@ -132,8 +135,9 @@ partial class Main
         entriesListView.Name = "entriesListView";
         entriesListView.Size = new System.Drawing.Size(387, 760);
         entriesListView.TabIndex = 1;
+        entriesListView.TileSize = new System.Drawing.Size(350, 48);
         entriesListView.UseCompatibleStateImageBehavior = false;
-        entriesListView.View = System.Windows.Forms.View.Details;
+        entriesListView.View = System.Windows.Forms.View.Tile;
         entriesListView.SelectedIndexChanged += entriesListView_SelectedIndexChanged;
         // 
         // detailsPanel
@@ -258,11 +262,10 @@ partial class Main
         // detailsTitleLabel
         // 
         detailsTitleLabel.AutoSize = true;
-        detailsTitleLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold);
         detailsTitleLabel.Location = new System.Drawing.Point(13, 13);
         detailsTitleLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
         detailsTitleLabel.Name = "detailsTitleLabel";
-        detailsTitleLabel.Size = new System.Drawing.Size(134, 25);
+        detailsTitleLabel.Size = new System.Drawing.Size(99, 20);
         detailsTitleLabel.TabIndex = 0;
         detailsTitleLabel.Text = "Entry Details";
         // 
@@ -340,7 +343,7 @@ partial class Main
         Controls.Add(detailsPanel);
         Controls.Add(splitter1);
         Controls.Add(groupsTreeView);
-        Icon = new System.Drawing.Icon("favicon.ico");
+        Icon = ((System.Drawing.Icon)resources.GetObject("$this.Icon"));
         Margin = new System.Windows.Forms.Padding(4);
         StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
         Text = "KeeZ";
