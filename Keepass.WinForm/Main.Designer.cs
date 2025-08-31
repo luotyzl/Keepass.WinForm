@@ -44,6 +44,12 @@ partial class Main
     private System.Windows.Forms.ContextMenuStrip trayContextMenu;
     private System.Windows.Forms.ToolStripMenuItem showToolStripMenuItem;
     private System.Windows.Forms.ToolStripMenuItem exitToolStripMenuItem;
+    private System.Windows.Forms.Button addButton;
+    private System.Windows.Forms.Panel headerPanel;
+    private System.Windows.Forms.PictureBox entryIconPictureBox;
+    private System.Windows.Forms.Label entryNameLabel;
+    private System.Windows.Forms.Button copyUsernameButton;
+    private System.Windows.Forms.Button copyPasswordButton;
 
     #region Windows Form Designer generated code
 
@@ -77,13 +83,21 @@ partial class Main
         searchPanel = new System.Windows.Forms.Panel();
         searchTextBox = new System.Windows.Forms.TextBox();
         searchIcon = new System.Windows.Forms.PictureBox();
+        addButton = new System.Windows.Forms.Button();
+        headerPanel = new System.Windows.Forms.Panel();
+        entryIconPictureBox = new System.Windows.Forms.PictureBox();
+        entryNameLabel = new System.Windows.Forms.Label();
+        copyUsernameButton = new System.Windows.Forms.Button();
+        copyPasswordButton = new System.Windows.Forms.Button();
         splitter1 = new System.Windows.Forms.Splitter();
         splitter2 = new System.Windows.Forms.Splitter();
         trayContextMenu.SuspendLayout();
         detailsPanel.SuspendLayout();
+        headerPanel.SuspendLayout();
         centerPanel.SuspendLayout();
         searchPanel.SuspendLayout();
         ((System.ComponentModel.ISupportInitialize)searchIcon).BeginInit();
+        ((System.ComponentModel.ISupportInitialize)entryIconPictureBox).BeginInit();
         SuspendLayout();
         // 
         // trayContextMenu
@@ -147,13 +161,13 @@ partial class Main
         detailsPanel.Controls.Add(notesLabel);
         detailsPanel.Controls.Add(urlTextBox);
         detailsPanel.Controls.Add(urlLabel);
+        detailsPanel.Controls.Add(copyPasswordButton);
         detailsPanel.Controls.Add(passwordTextBox);
         detailsPanel.Controls.Add(passwordLabel);
+        detailsPanel.Controls.Add(copyUsernameButton);
         detailsPanel.Controls.Add(usernameTextBox);
         detailsPanel.Controls.Add(usernameLabel);
-        detailsPanel.Controls.Add(titleTextBox);
-        detailsPanel.Controls.Add(titleLabel);
-        detailsPanel.Controls.Add(detailsTitleLabel);
+        detailsPanel.Controls.Add(headerPanel);
         detailsPanel.Dock = System.Windows.Forms.DockStyle.Right;
         detailsPanel.Location = new System.Drawing.Point(651, 0);
         detailsPanel.Margin = new System.Windows.Forms.Padding(4);
@@ -164,7 +178,7 @@ partial class Main
         // 
         // notesTextBox
         // 
-        notesTextBox.Location = new System.Drawing.Point(13, 413);
+        notesTextBox.Location = new System.Drawing.Point(13, 313);
         notesTextBox.Margin = new System.Windows.Forms.Padding(4);
         notesTextBox.Multiline = true;
         notesTextBox.Name = "notesTextBox";
@@ -176,7 +190,7 @@ partial class Main
         // notesLabel
         // 
         notesLabel.AutoSize = true;
-        notesLabel.Location = new System.Drawing.Point(13, 387);
+        notesLabel.Location = new System.Drawing.Point(13, 287);
         notesLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
         notesLabel.Name = "notesLabel";
         notesLabel.Size = new System.Drawing.Size(57, 20);
@@ -185,7 +199,7 @@ partial class Main
         // 
         // urlTextBox
         // 
-        urlTextBox.Location = new System.Drawing.Point(13, 333);
+        urlTextBox.Location = new System.Drawing.Point(13, 253);
         urlTextBox.Margin = new System.Windows.Forms.Padding(4);
         urlTextBox.Name = "urlTextBox";
         urlTextBox.ReadOnly = true;
@@ -195,7 +209,7 @@ partial class Main
         // urlLabel
         // 
         urlLabel.AutoSize = true;
-        urlLabel.Location = new System.Drawing.Point(13, 307);
+        urlLabel.Location = new System.Drawing.Point(13, 227);
         urlLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
         urlLabel.Name = "urlLabel";
         urlLabel.Size = new System.Drawing.Size(42, 20);
@@ -204,18 +218,18 @@ partial class Main
         // 
         // passwordTextBox
         // 
-        passwordTextBox.Location = new System.Drawing.Point(13, 253);
+        passwordTextBox.Location = new System.Drawing.Point(13, 193);
         passwordTextBox.Margin = new System.Windows.Forms.Padding(4);
         passwordTextBox.Name = "passwordTextBox";
         passwordTextBox.PasswordChar = '*';
         passwordTextBox.ReadOnly = true;
-        passwordTextBox.Size = new System.Drawing.Size(346, 27);
+        passwordTextBox.Size = new System.Drawing.Size(310, 27);
         passwordTextBox.TabIndex = 6;
         // 
         // passwordLabel
         // 
         passwordLabel.AutoSize = true;
-        passwordLabel.Location = new System.Drawing.Point(13, 227);
+        passwordLabel.Location = new System.Drawing.Point(13, 167);
         passwordLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
         passwordLabel.Name = "passwordLabel";
         passwordLabel.Size = new System.Drawing.Size(82, 20);
@@ -224,17 +238,17 @@ partial class Main
         // 
         // usernameTextBox
         // 
-        usernameTextBox.Location = new System.Drawing.Point(13, 173);
+        usernameTextBox.Location = new System.Drawing.Point(13, 133);
         usernameTextBox.Margin = new System.Windows.Forms.Padding(4);
         usernameTextBox.Name = "usernameTextBox";
         usernameTextBox.ReadOnly = true;
-        usernameTextBox.Size = new System.Drawing.Size(346, 27);
+        usernameTextBox.Size = new System.Drawing.Size(310, 27);
         usernameTextBox.TabIndex = 4;
         // 
         // usernameLabel
         // 
         usernameLabel.AutoSize = true;
-        usernameLabel.Location = new System.Drawing.Point(13, 147);
+        usernameLabel.Location = new System.Drawing.Point(13, 107);
         usernameLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
         usernameLabel.Name = "usernameLabel";
         usernameLabel.Size = new System.Drawing.Size(86, 20);
@@ -283,6 +297,7 @@ partial class Main
         // 
         // searchPanel
         // 
+        searchPanel.Controls.Add(addButton);
         searchPanel.Controls.Add(searchTextBox);
         searchPanel.Controls.Add(searchIcon);
         searchPanel.Dock = System.Windows.Forms.DockStyle.Top;
@@ -299,7 +314,7 @@ partial class Main
         searchTextBox.Margin = new System.Windows.Forms.Padding(4);
         searchTextBox.Name = "searchTextBox";
         searchTextBox.PlaceholderText = "Search entries...";
-        searchTextBox.Size = new System.Drawing.Size(341, 27);
+        searchTextBox.Size = new System.Drawing.Size(311, 27);
         searchTextBox.TabIndex = 0;
         searchTextBox.TextChanged += searchTextBox_TextChanged;
         // 
@@ -314,6 +329,66 @@ partial class Main
         searchIcon.TabStop = false;
         searchIcon.Click += searchIcon_Click;
         searchIcon.Paint += searchIcon_Paint;
+        // 
+        // addButton
+        // 
+        addButton.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right;
+        addButton.Location = new System.Drawing.Point(356, 5);
+        addButton.Margin = new System.Windows.Forms.Padding(4);
+        addButton.Name = "addButton";
+        addButton.Size = new System.Drawing.Size(27, 27);
+        addButton.TabIndex = 2;
+        addButton.Text = "+";
+        addButton.UseVisualStyleBackColor = true;
+        addButton.Click += addButton_Click;
+        // 
+        // headerPanel
+        // 
+        headerPanel.Controls.Add(entryNameLabel);
+        headerPanel.Controls.Add(entryIconPictureBox);
+        headerPanel.Dock = System.Windows.Forms.DockStyle.Top;
+        headerPanel.Location = new System.Drawing.Point(13, 13);
+        headerPanel.Name = "headerPanel";
+        headerPanel.Size = new System.Drawing.Size(352, 60);
+        headerPanel.TabIndex = 11;
+        // 
+        // entryIconPictureBox
+        // 
+        entryIconPictureBox.Location = new System.Drawing.Point(0, 10);
+        entryIconPictureBox.Name = "entryIconPictureBox";
+        entryIconPictureBox.Size = new System.Drawing.Size(32, 32);
+        entryIconPictureBox.TabIndex = 0;
+        entryIconPictureBox.TabStop = false;
+        // 
+        // entryNameLabel
+        // 
+        entryNameLabel.AutoSize = true;
+        entryNameLabel.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold);
+        entryNameLabel.Location = new System.Drawing.Point(40, 15);
+        entryNameLabel.Name = "entryNameLabel";
+        entryNameLabel.Size = new System.Drawing.Size(100, 28);
+        entryNameLabel.TabIndex = 1;
+        entryNameLabel.Text = "Entry Name";
+        // 
+        // copyUsernameButton
+        // 
+        copyUsernameButton.Location = new System.Drawing.Point(329, 133);
+        copyUsernameButton.Name = "copyUsernameButton";
+        copyUsernameButton.Size = new System.Drawing.Size(30, 27);
+        copyUsernameButton.TabIndex = 12;
+        copyUsernameButton.Text = "📋";
+        copyUsernameButton.UseVisualStyleBackColor = true;
+        copyUsernameButton.Click += copyUsernameButton_Click;
+        // 
+        // copyPasswordButton
+        // 
+        copyPasswordButton.Location = new System.Drawing.Point(329, 193);
+        copyPasswordButton.Name = "copyPasswordButton";
+        copyPasswordButton.Size = new System.Drawing.Size(30, 27);
+        copyPasswordButton.TabIndex = 13;
+        copyPasswordButton.Text = "📋";
+        copyPasswordButton.UseVisualStyleBackColor = true;
+        copyPasswordButton.Click += copyPasswordButton_Click;
         // 
         // splitter1
         // 
@@ -353,10 +428,13 @@ partial class Main
         trayContextMenu.ResumeLayout(false);
         detailsPanel.ResumeLayout(false);
         detailsPanel.PerformLayout();
+        headerPanel.ResumeLayout(false);
+        headerPanel.PerformLayout();
         centerPanel.ResumeLayout(false);
         searchPanel.ResumeLayout(false);
         searchPanel.PerformLayout();
         ((System.ComponentModel.ISupportInitialize)searchIcon).EndInit();
+        ((System.ComponentModel.ISupportInitialize)entryIconPictureBox).EndInit();
         ResumeLayout(false);
     }
 

@@ -7,6 +7,8 @@ public partial class Main : Form
     private List<ListViewItem> allEntries = new List<ListViewItem>();
     private ImageList entryIcons = new ImageList();
     private KeePassLib.PwDatabase? database;
+    private System.Threading.Timer? clipboardTimer;
+    private string lastClipboardContent = string.Empty;
 
     public Main()
     {
@@ -24,6 +26,12 @@ public partial class Main : Form
         database = pwDatabase;
         LoadDatabaseGroups(); // Load actual groups from database
         LoadDatabaseEntries(); // Load all entries initially
+        
+        // Auto-select "All Items" and first entry on startup
+        if (groupsTreeView.Nodes.Count > 0)
+        {
+            groupsTreeView.SelectedNode = groupsTreeView.Nodes[0];
+        }
     }
 
     private void InitializeTreeView()
@@ -100,6 +108,18 @@ public partial class Main : Form
                 entriesListView.Items.Add(clonedItem);
             }
         }
+        
+        // Auto-select first entry if available after filtering
+        if (entriesListView.Items.Count > 0)
+        {
+            entriesListView.Items[0].Selected = true;
+            entriesListView.Items[0].Focused = true;
+            ShowEntryDetails(entriesListView.Items[0]);
+        }
+        else
+        {
+            ShowPlaceholderMessage();
+        }
     }
 
     private void entriesListView_SelectedIndexChanged(object sender, EventArgs e)
@@ -117,8 +137,14 @@ public partial class Main : Form
 
     private void ShowEntryDetails(ListViewItem item)
     {
-        titleTextBox.Text = item.SubItems[1].Text;
-        usernameTextBox.Text = item.SubItems[2].Text;
+        string title = item.SubItems[1].Text;
+        string username = item.SubItems[2].Text;
+        
+        // Update header with icon and name
+        entryNameLabel.Text = title;
+        entryIconPictureBox.Image = entryIcons.Images[item.ImageKey];
+        
+        usernameTextBox.Text = username;
         
         if (item.Tag != null)
         {
@@ -137,11 +163,22 @@ public partial class Main : Form
 
     private void ClearEntryDetails()
     {
-        titleTextBox.Text = "";
+        entryNameLabel.Text = "";
+        entryIconPictureBox.Image = null;
         usernameTextBox.Text = "";
         passwordTextBox.Text = "";
         urlTextBox.Text = "";
         notesTextBox.Text = "";
+    }
+    
+    private void ShowPlaceholderMessage()
+    {
+        entryNameLabel.Text = "";
+        entryIconPictureBox.Image = null;
+        usernameTextBox.Text = "";
+        passwordTextBox.Text = "";
+        urlTextBox.Text = "";
+        notesTextBox.Text = "Your passwords will be displayed here";
     }
 
     private void searchIcon_Paint(object sender, PaintEventArgs e)
@@ -384,6 +421,103 @@ public partial class Main : Form
         return bitmap;
     }
 
+    private int GetTotalNonRecycledEntryCount()
+    {
+        if (database?.RootGroup == null) return 0;
+        
+        int count = 0;
+        foreach (KeePassLib.PwGroup group in database.RootGroup.GetFlatGroupList())
+        {
+            if (IsRecycleBin(group)) continue;
+            count += GetActiveEntriesCount(group);
+        }
+        return count;
+    }
+    
+    private int GetGroupEntryCount(KeePassLib.PwGroup group, bool includeSubgroups = false)
+    {
+        if (group?.Entries == null) return 0;
+        
+        int count = GetActiveEntriesCount(group);
+        
+        if (includeSubgroups)
+        {
+            foreach (KeePassLib.PwGroup subGroup in group.Groups)
+            {
+                count += GetGroupEntryCount(subGroup, true);
+            }
+        }
+        
+        return count;
+    }
+    
+    private int GetActiveEntriesCount(KeePassLib.PwGroup group)
+    {
+        if (group?.Entries == null) return 0;
+        
+        return group.Entries.Count(entry => 
+            !entry.Expires || entry.ExpiryTime > DateTime.Now);
+    }
+    
+    private void addButton_Click(object sender, EventArgs e)
+    {
+        MessageBox.Show("Add new entry functionality will be implemented here.", "Add Entry", MessageBoxButtons.OK, MessageBoxIcon.Information);
+    }
+    
+    private void copyUsernameButton_Click(object sender, EventArgs e)
+    {
+        if (!string.IsNullOrEmpty(usernameTextBox.Text))
+        {
+            CopyToClipboardWithTimer(usernameTextBox.Text);
+        }
+    }
+    
+    private void copyPasswordButton_Click(object sender, EventArgs e)
+    {
+        if (!string.IsNullOrEmpty(passwordTextBox.Text))
+        {
+            if (entriesListView.SelectedItems.Count > 0 && entriesListView.SelectedItems[0].Tag != null)
+            {
+                dynamic tagData = entriesListView.SelectedItems[0].Tag;
+                CopyToClipboardWithTimer(tagData.Password);
+            }
+        }
+    }
+    
+    private void CopyToClipboardWithTimer(string content)
+    {
+        // Dispose existing timer if any
+        clipboardTimer?.Dispose();
+        
+        // Copy to clipboard
+        lastClipboardContent = content;
+        Clipboard.SetText(content);
+        
+        // Start 30-second timer to clear clipboard
+        clipboardTimer = new System.Threading.Timer(ClearClipboard, null, 30000, System.Threading.Timeout.Infinite);
+    }
+    
+    private void ClearClipboard(object? state)
+    {
+        try
+        {
+            // Only clear if our content is still in clipboard
+            if (Clipboard.ContainsText() && Clipboard.GetText() == lastClipboardContent)
+            {
+                Clipboard.Clear();
+            }
+        }
+        catch
+        {
+            // Ignore clipboard access errors
+        }
+        finally
+        {
+            clipboardTimer?.Dispose();
+            clipboardTimer = null;
+        }
+    }
+
     private void LoadDatabaseGroups()
     {
         if (database == null) return;
@@ -392,7 +526,8 @@ public partial class Main : Form
         groupsTreeView.Nodes.Clear();
 
         // Add special "All Items" group first
-        TreeNode allItemsNode = new TreeNode("All Items");
+        int totalCount = GetTotalNonRecycledEntryCount();
+        TreeNode allItemsNode = new TreeNode($"All Items ({totalCount})");
         allItemsNode.Tag = "ALL_ITEMS";
         groupsTreeView.Nodes.Add(allItemsNode);
 
@@ -406,7 +541,8 @@ public partial class Main : Form
         var recycleBin = GetRecycleBinGroup();
         if (recycleBin != null)
         {
-            TreeNode recycleBinNode = new TreeNode("🗑️ Recycle Bin");
+            int recycleBinCount = GetGroupEntryCount(recycleBin, true);
+            TreeNode recycleBinNode = new TreeNode($"🗑️ Recycle Bin ({recycleBinCount})");
             recycleBinNode.Tag = recycleBin;
             groupsTreeView.Nodes.Add(recycleBinNode);
             
@@ -436,7 +572,8 @@ public partial class Main : Form
         // Skip the root group itself (use its children) and conditionally skip recycle bin
         if (group != database?.RootGroup && (includeRecycleBin || !IsRecycleBin(group)))
         {
-            TreeNode groupNode = new TreeNode(group.Name);
+            int groupCount = GetGroupEntryCount(group, includeRecycleBin);
+            TreeNode groupNode = new TreeNode($"{group.Name} ({groupCount})");
             groupNode.Tag = group;
 
             if (parentNode == null)
@@ -502,6 +639,18 @@ public partial class Main : Form
         if (!string.IsNullOrWhiteSpace(searchTextBox.Text))
         {
             FilterEntries(searchTextBox.Text);
+        }
+        
+        // Auto-select first entry if available
+        if (entriesListView.Items.Count > 0)
+        {
+            entriesListView.Items[0].Selected = true;
+            entriesListView.Items[0].Focused = true;
+            ShowEntryDetails(entriesListView.Items[0]);
+        }
+        else
+        {
+            ShowPlaceholderMessage();
         }
     }
 
