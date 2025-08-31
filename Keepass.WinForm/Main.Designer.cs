@@ -135,9 +135,10 @@ partial class Main
         entriesListView.Name = "entriesListView";
         entriesListView.Size = new System.Drawing.Size(387, 760);
         entriesListView.TabIndex = 1;
-        entriesListView.TileSize = new System.Drawing.Size(350, 48);
         entriesListView.UseCompatibleStateImageBehavior = false;
-        entriesListView.View = System.Windows.Forms.View.Tile;
+        entriesListView.View = System.Windows.Forms.View.Details;
+        entriesListView.FullRowSelect = true;
+        entriesListView.GridLines = true;
         entriesListView.SelectedIndexChanged += entriesListView_SelectedIndexChanged;
         // 
         // detailsPanel

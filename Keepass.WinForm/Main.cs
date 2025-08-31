@@ -48,18 +48,9 @@ public partial class Main : Form
     private void InitializeIcons()
     {
         entryIcons = new ImageList();
-        entryIcons.ImageSize = new Size(32, 32);
+        entryIcons.ImageSize = new Size(16, 16);
         entryIcons.ColorDepth = ColorDepth.Depth32Bit;
         
-        // Create basic icons for different entry types
-        entryIcons.Images.Add("default", CreateDefaultIcon());
-        entryIcons.Images.Add("email", CreateEmailIcon());
-        entryIcons.Images.Add("web", CreateWebIcon());
-        entryIcons.Images.Add("social", CreateSocialIcon());
-        entryIcons.Images.Add("bank", CreateBankIcon());
-        entryIcons.Images.Add("shopping", CreateShoppingIcon());
-        
-        entriesListView.LargeImageList = entryIcons;
         entriesListView.SmallImageList = entryIcons;
     }
 
@@ -67,9 +58,14 @@ public partial class Main : Form
     {
         entriesListView.FullRowSelect = true;
         
-        // Configure for tile view with two-line display
-        entriesListView.TileSize = new Size(350, 48);
-        entriesListView.View = View.Tile;
+        // Configure for Details view with 3 columns
+        entriesListView.View = View.Details;
+        entriesListView.GridLines = true;
+        
+        // Add columns: Icon, Name, Username
+        entriesListView.Columns.Add("Icon", 60);
+        entriesListView.Columns.Add("Name", 200);
+        entriesListView.Columns.Add("Username", 150);
     }
     
     private void searchTextBox_TextChanged(object sender, EventArgs e)
@@ -93,7 +89,6 @@ public partial class Main : Form
         else
         {
             var filteredEntries = allEntries.Where(item =>
-                item.SubItems[0].Text.IndexOf(searchText, StringComparison.OrdinalIgnoreCase) >= 0 ||
                 item.SubItems[1].Text.IndexOf(searchText, StringComparison.OrdinalIgnoreCase) >= 0 ||
                 item.SubItems[2].Text.IndexOf(searchText, StringComparison.OrdinalIgnoreCase) >= 0
             );
@@ -122,20 +117,21 @@ public partial class Main : Form
 
     private void ShowEntryDetails(ListViewItem item)
     {
-        titleTextBox.Text = item.SubItems[0].Text;
-        usernameTextBox.Text = item.SubItems[1].Text;
-        urlTextBox.Text = item.SubItems[2].Text;
-
+        titleTextBox.Text = item.SubItems[1].Text;
+        usernameTextBox.Text = item.SubItems[2].Text;
+        
         if (item.Tag != null)
         {
             dynamic tagData = item.Tag;
             passwordTextBox.Text = tagData.Password;
             notesTextBox.Text = tagData.Notes;
+            urlTextBox.Text = tagData.Url;
         }
         else
         {
             passwordTextBox.Text = "";
             notesTextBox.Text = "";
+            urlTextBox.Text = "";
         }
     }
 
@@ -228,23 +224,142 @@ public partial class Main : Form
         }
     }
 
-    private string GetIconKeyForEntry(string title, string url)
+    private void SetEntryIcon(ListViewItem item, KeePassLib.PwEntry entry)
     {
-        string lowerTitle = title.ToLower();
-        string lowerUrl = url.ToLower();
-        
-        if (lowerTitle.Contains("gmail") || lowerTitle.Contains("email") || lowerTitle.Contains("mail"))
-            return "email";
-        else if (lowerTitle.Contains("facebook") || lowerTitle.Contains("twitter") || lowerTitle.Contains("instagram"))
-            return "social";
-        else if (lowerTitle.Contains("bank") || lowerTitle.Contains("credit") || lowerTitle.Contains("finance"))
-            return "bank";
-        else if (lowerTitle.Contains("amazon") || lowerTitle.Contains("shop") || lowerTitle.Contains("store"))
-            return "shopping";
-        else if (lowerUrl.Contains("http") || lowerTitle.Contains("web") || lowerTitle.Contains("github"))
-            return "web";
-        else
-            return "default";
+        try
+        {
+            // Check if entry has a custom icon
+            if (entry.CustomIconUuid != KeePassLib.PwUuid.Zero && database != null)
+            {
+                var customIcon = database.CustomIcons.FirstOrDefault(ci => ci.Uuid.Equals(entry.CustomIconUuid));
+                if (customIcon?.ImageDataPng != null)
+                {
+                    using (var stream = new MemoryStream(customIcon.ImageDataPng))
+                    {
+                        var iconImage = Image.FromStream(stream);
+                        var iconKey = entry.CustomIconUuid.ToHexString();
+                        
+                        if (!entryIcons.Images.ContainsKey(iconKey))
+                        {
+                            entryIcons.Images.Add(iconKey, new Bitmap(iconImage, 16, 16));
+                        }
+                        item.ImageKey = iconKey;
+                        return;
+                    }
+                }
+            }
+            
+            // Use standard icon from KeePass
+            var standardIconId = (int)entry.IconId;
+            var standardIconKey = $"std_{standardIconId}";
+            
+            if (!entryIcons.Images.ContainsKey(standardIconKey))
+            {
+                var standardIcon = GetStandardIcon(entry.IconId);
+                entryIcons.Images.Add(standardIconKey, standardIcon);
+            }
+            item.ImageKey = standardIconKey;
+        }
+        catch
+        {
+            // Fallback to default icon if anything goes wrong
+            item.ImageKey = "";
+        }
+    }
+
+    private Bitmap GetStandardIcon(KeePassLib.PwIcon iconId)
+    {
+        // Create a simple representation of standard KeePass icons
+        var bitmap = new Bitmap(16, 16);
+        using (var g = Graphics.FromImage(bitmap))
+        {
+            g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
+            g.Clear(Color.Transparent);
+            
+            Color iconColor = GetStandardIconColor(iconId);
+            using (var brush = new SolidBrush(iconColor))
+            {
+                g.FillEllipse(brush, 2, 2, 12, 12);
+            }
+        }
+        return bitmap;
+    }
+    
+    private Color GetStandardIconColor(KeePassLib.PwIcon iconId)
+    {
+        return iconId switch
+        {
+            KeePassLib.PwIcon.Key => Color.Gray,
+            KeePassLib.PwIcon.World => Color.Blue,
+            KeePassLib.PwIcon.Warning => Color.Orange,
+            KeePassLib.PwIcon.NetworkServer => Color.Green,
+            KeePassLib.PwIcon.MarkedDirectory => Color.Yellow,
+            KeePassLib.PwIcon.UserCommunication => Color.Purple,
+            KeePassLib.PwIcon.Parts => Color.Brown,
+            KeePassLib.PwIcon.Notepad => Color.LightBlue,
+            KeePassLib.PwIcon.WorldSocket => Color.DarkBlue,
+            KeePassLib.PwIcon.Identity => Color.Pink,
+            KeePassLib.PwIcon.PaperReady => Color.White,
+            KeePassLib.PwIcon.Digicam => Color.Red,
+            KeePassLib.PwIcon.IRCommunication => Color.Cyan,
+            KeePassLib.PwIcon.MultiKeys => Color.DarkGray,
+            KeePassLib.PwIcon.Energy => Color.Yellow,
+            KeePassLib.PwIcon.Scanner => Color.Magenta,
+            KeePassLib.PwIcon.WorldStar => Color.Gold,
+            KeePassLib.PwIcon.CDRom => Color.Silver,
+            KeePassLib.PwIcon.Monitor => Color.Black,
+            KeePassLib.PwIcon.EMail => Color.LightGreen,
+            KeePassLib.PwIcon.Configuration => Color.DarkRed,
+            KeePassLib.PwIcon.ClipboardReady => Color.Beige,
+            KeePassLib.PwIcon.PaperNew => Color.WhiteSmoke,
+            KeePassLib.PwIcon.Screen => Color.Navy,
+            KeePassLib.PwIcon.EnergyCareful => Color.Olive,
+            KeePassLib.PwIcon.EMailBox => Color.Lime,
+            KeePassLib.PwIcon.Disk => Color.Maroon,
+            KeePassLib.PwIcon.Drive => Color.Teal,
+            KeePassLib.PwIcon.PaperQ => Color.Aqua,
+            KeePassLib.PwIcon.TerminalEncrypted => Color.Fuchsia,
+            KeePassLib.PwIcon.Console => Color.DarkCyan,
+            KeePassLib.PwIcon.Printer => Color.DarkMagenta,
+            KeePassLib.PwIcon.ProgramIcons => Color.DarkOliveGreen,
+            KeePassLib.PwIcon.Run => Color.DarkOrchid,
+            KeePassLib.PwIcon.Settings => Color.DarkSalmon,
+            KeePassLib.PwIcon.WorldComputer => Color.DarkSeaGreen,
+            KeePassLib.PwIcon.Archive => Color.DarkSlateBlue,
+            KeePassLib.PwIcon.Homebanking => Color.DarkTurquoise,
+            KeePassLib.PwIcon.DriveWindows => Color.DarkViolet,
+            KeePassLib.PwIcon.Clock => Color.DeepPink,
+            KeePassLib.PwIcon.EMailSearch => Color.DeepSkyBlue,
+            KeePassLib.PwIcon.PaperFlag => Color.DimGray,
+            KeePassLib.PwIcon.Memory => Color.DodgerBlue,
+            KeePassLib.PwIcon.TrashBin => Color.Firebrick,
+            KeePassLib.PwIcon.Note => Color.ForestGreen,
+            KeePassLib.PwIcon.Expired => Color.Gainsboro,
+            KeePassLib.PwIcon.Info => Color.GhostWhite,
+            KeePassLib.PwIcon.Package => Color.Goldenrod,
+            KeePassLib.PwIcon.Folder => Color.HotPink,
+            KeePassLib.PwIcon.FolderOpen => Color.IndianRed,
+            KeePassLib.PwIcon.FolderPackage => Color.Indigo,
+            KeePassLib.PwIcon.LockOpen => Color.Ivory,
+            KeePassLib.PwIcon.PaperLocked => Color.Khaki,
+            KeePassLib.PwIcon.Checked => Color.Lavender,
+            KeePassLib.PwIcon.Pen => Color.LawnGreen,
+            KeePassLib.PwIcon.Thumbnail => Color.LemonChiffon,
+            KeePassLib.PwIcon.Book => Color.LightCoral,
+            KeePassLib.PwIcon.List => Color.LightGoldenrodYellow,
+            KeePassLib.PwIcon.UserKey => Color.LightGray,
+            KeePassLib.PwIcon.Tool => Color.LightPink,
+            KeePassLib.PwIcon.Home => Color.LightSalmon,
+            KeePassLib.PwIcon.Star => Color.LightSkyBlue,
+            KeePassLib.PwIcon.Tux => Color.LightSlateGray,
+            KeePassLib.PwIcon.Feather => Color.LightSteelBlue,
+            KeePassLib.PwIcon.Apple => Color.LightYellow,
+            KeePassLib.PwIcon.Wiki => Color.LimeGreen,
+            KeePassLib.PwIcon.Money => Color.Linen,
+            KeePassLib.PwIcon.Certificate => Color.MediumAquamarine,
+            KeePassLib.PwIcon.BlackBerry => Color.MediumBlue,
+            _ => Color.Gray
+        };
     }
 
     private Bitmap CreateDefaultIcon()
@@ -264,138 +379,6 @@ public partial class Main : Form
                 g.DrawLine(pen, 12, 12, 24, 12);
                 g.DrawLine(pen, 20, 8, 20, 12);
                 g.DrawLine(pen, 24, 10, 24, 14);
-            }
-        }
-        return bitmap;
-    }
-
-    private Bitmap CreateEmailIcon()
-    {
-        var bitmap = new Bitmap(32, 32);
-        using (var g = Graphics.FromImage(bitmap))
-        {
-            g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
-            g.Clear(Color.Transparent);
-            
-            // Draw envelope
-            using (var brush = new SolidBrush(Color.LightBlue))
-            using (var pen = new Pen(Color.Blue, 2))
-            {
-                Rectangle rect = new Rectangle(4, 8, 24, 16);
-                g.FillRectangle(brush, rect);
-                g.DrawRectangle(pen, rect);
-                
-                // Draw letter fold
-                Point[] points = { new Point(4, 8), new Point(16, 16), new Point(28, 8) };
-                g.DrawLines(pen, points);
-            }
-        }
-        return bitmap;
-    }
-
-    private Bitmap CreateWebIcon()
-    {
-        var bitmap = new Bitmap(32, 32);
-        using (var g = Graphics.FromImage(bitmap))
-        {
-            g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
-            g.Clear(Color.Transparent);
-            
-            // Draw globe
-            using (var brush = new SolidBrush(Color.LightGreen))
-            using (var pen = new Pen(Color.Green, 2))
-            {
-                g.FillEllipse(brush, 4, 4, 24, 24);
-                g.DrawEllipse(pen, 4, 4, 24, 24);
-                
-                // Draw grid lines
-                g.DrawLine(pen, 16, 4, 16, 28);
-                g.DrawLine(pen, 4, 16, 28, 16);
-                g.DrawArc(pen, 8, 4, 16, 24, 0, 180);
-                g.DrawArc(pen, 8, 4, 16, 24, 180, 180);
-            }
-        }
-        return bitmap;
-    }
-
-    private Bitmap CreateSocialIcon()
-    {
-        var bitmap = new Bitmap(32, 32);
-        using (var g = Graphics.FromImage(bitmap))
-        {
-            g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
-            g.Clear(Color.Transparent);
-            
-            // Draw people icons
-            using (var brush = new SolidBrush(Color.Orange))
-            using (var pen = new Pen(Color.DarkOrange, 2))
-            {
-                // Person 1
-                g.FillEllipse(brush, 6, 6, 8, 8);
-                g.FillEllipse(brush, 4, 16, 12, 12);
-                
-                // Person 2
-                g.FillEllipse(brush, 18, 8, 6, 6);
-                g.FillEllipse(brush, 16, 16, 10, 10);
-            }
-        }
-        return bitmap;
-    }
-
-    private Bitmap CreateBankIcon()
-    {
-        var bitmap = new Bitmap(32, 32);
-        using (var g = Graphics.FromImage(bitmap))
-        {
-            g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
-            g.Clear(Color.Transparent);
-            
-            // Draw bank building
-            using (var brush = new SolidBrush(Color.Gold))
-            using (var pen = new Pen(Color.DarkGoldenrod, 2))
-            {
-                // Base
-                g.FillRectangle(brush, 4, 22, 24, 6);
-                g.DrawRectangle(pen, 4, 22, 24, 6);
-                
-                // Columns
-                g.FillRectangle(brush, 8, 10, 3, 12);
-                g.FillRectangle(brush, 14, 10, 3, 12);
-                g.FillRectangle(brush, 20, 10, 3, 12);
-                
-                // Top triangle
-                Point[] roof = { new Point(16, 4), new Point(6, 10), new Point(26, 10) };
-                g.FillPolygon(brush, roof);
-                g.DrawPolygon(pen, roof);
-            }
-        }
-        return bitmap;
-    }
-
-    private Bitmap CreateShoppingIcon()
-    {
-        var bitmap = new Bitmap(32, 32);
-        using (var g = Graphics.FromImage(bitmap))
-        {
-            g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
-            g.Clear(Color.Transparent);
-            
-            // Draw shopping cart
-            using (var brush = new SolidBrush(Color.Purple))
-            using (var pen = new Pen(Color.DarkMagenta, 2))
-            {
-                // Cart body
-                g.DrawRectangle(pen, 8, 12, 16, 10);
-                g.DrawLine(pen, 6, 8, 10, 12);
-                g.DrawLine(pen, 6, 8, 4, 8);
-                
-                // Wheels
-                g.FillEllipse(brush, 10, 24, 4, 4);
-                g.FillEllipse(brush, 18, 24, 4, 4);
-                
-                // Handle
-                g.DrawLine(pen, 24, 10, 26, 8);
-                g.DrawLine(pen, 26, 8, 28, 10);
             }
         }
         return bitmap;
@@ -549,15 +532,13 @@ public partial class Main : Form
             string url = entry.Strings.ReadSafe(KeePassLib.PwDefs.UrlField);
             string notes = entry.Strings.ReadSafe(KeePassLib.PwDefs.NotesField);
 
-            var item = new ListViewItem(title);
+            var item = new ListViewItem("");
+            item.SubItems.Add(title);
             item.SubItems.Add(username);
-            item.SubItems.Add(url);
-            item.SubItems.Add(entry.LastModificationTime.ToString("yyyy-MM-dd"));
-            item.Tag = new { Password = password, Notes = notes, Entry = entry };
+            item.Tag = new { Password = password, Notes = notes, Entry = entry, Url = url };
 
-            // Set icon based on entry
-            string iconKey = GetIconKeyForEntry(title, url);
-            item.ImageKey = iconKey;
+            // Set icon from KDBX entry
+            SetEntryIcon(item, entry);
 
             allEntries.Add(item);
             entriesListView.Items.Add(item);
