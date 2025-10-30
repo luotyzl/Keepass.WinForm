@@ -1,0 +1,76 @@
+﻿<Window x:Class="Keepass.Wpf.Views.SettingsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        Title="Settings" Height="400" Width="500"
+        WindowStartupLocation="CenterScreen"
+        ResizeMode="NoResize">
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Title -->
+        <TextBlock Grid.Row="0" Text="Database Configuration" 
+                   FontSize="16" FontWeight="Bold" 
+                   Margin="0,0,0,20"/>
+
+        <!-- Configuration Options -->
+        <TabControl Grid.Row="1">
+            <!-- Local Database Tab -->
+            <TabItem Header="Local Database">
+                <StackPanel Margin="10">
+                    <TextBlock Text="Local Database File:" 
+                               FontWeight="Bold" Margin="0,0,0,5"/>
+                    <Grid Margin="0,0,0,15">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBox Grid.Column="0" 
+                                 Text="{Binding LocalDatabasePath}"
+                                 Height="25" IsReadOnly="True"/>
+                        <Button Grid.Column="1" 
+                                Content="Browse..." Width="80" Height="25" 
+                                Margin="5,0,0,0"
+                                Command="{Binding BrowseCommand}"/>
+                    </Grid>
+                </StackPanel>
+            </TabItem>
+
+            <!-- WebDAV Tab -->
+            <TabItem Header="WebDAV">
+                <StackPanel Margin="10">
+                    <TextBlock Text="Server URL:" FontWeight="Bold" Margin="0,0,0,5"/>
+                    <TextBox Text="{Binding WebDavUrl}" Height="25" Margin="0,0,0,10"/>
+
+                    <TextBlock Text="Username:" FontWeight="Bold" Margin="0,0,0,5"/>
+                    <TextBox Text="{Binding WebDavUsername}" Height="25" Margin="0,0,0,10"/>
+
+                    <TextBlock Text="Password:" FontWeight="Bold" Margin="0,0,0,5"/>
+                    <PasswordBox Name="WebDavPasswordBox" Height="25" Margin="0,0,0,10"
+                                 PasswordChanged="WebDavPasswordBox_PasswordChanged"/>
+
+                    <TextBlock Text="Database Path:" FontWeight="Bold" Margin="0,0,0,5"/>
+                    <TextBox Text="{Binding WebDavDatabasePath}" Height="25" 
+                             ToolTip="e.g., /path/to/database.kdbx"/>
+                </StackPanel>
+            </TabItem>
+        </TabControl>
+
+        <!-- Buttons -->
+        <StackPanel Grid.Row="2" Orientation="Horizontal" 
+                    HorizontalAlignment="Right" Margin="0,20,0,0">
+            <Button Content="Cancel" 
+                    Width="80" Height="30" Margin="0,0,10,0"
+                    Command="{Binding CancelCommand}"/>
+            <Button Content="Save" 
+                    Width="80" Height="30" IsDefault="True"
+                    Command="{Binding SaveCommand}"/>
+        </StackPanel>
+    </Grid>
+</Window>

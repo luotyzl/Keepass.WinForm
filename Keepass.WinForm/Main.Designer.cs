@@ -363,7 +363,6 @@ partial class Main
         // entryNameLabel
         // 
         entryNameLabel.AutoSize = true;
-        entryNameLabel.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold);
         entryNameLabel.Location = new System.Drawing.Point(40, 15);
         entryNameLabel.Name = "entryNameLabel";
         entryNameLabel.Size = new System.Drawing.Size(100, 28);
