@@ -17,15 +17,17 @@ namespace Keepass.Wpf.ViewModels
         private string _databaseFileDisplay = "No database configured";
         private string _errorMessage = string.Empty;
         private bool _isErrorVisible;
+        private bool _showOpenHint = true;
 
         public LoginViewModel()
         {
             _configService = new ConfigurationService();
             _databaseService = new DatabaseService();
-            
+
             LoginCommand = new RelayCommand(async () => await LoginAsync(), () => !string.IsNullOrEmpty(Password));
             SettingsCommand = new RelayCommand(ShowSettings);
-            
+            OpenDatabaseCommand = new RelayCommand(OpenDatabase);
+
             LoadUserConfig();
         }
 
@@ -60,8 +62,15 @@ namespace Keepass.Wpf.ViewModels
             set => SetProperty(ref _isErrorVisible, value);
         }
 
+        public bool ShowOpenHint
+        {
+            get => _showOpenHint;
+            set => SetProperty(ref _showOpenHint, value);
+        }
+
         public ICommand LoginCommand { get; }
         public ICommand SettingsCommand { get; }
+        public ICommand OpenDatabaseCommand { get; }
 
         private void LoadUserConfig()
         {
@@ -157,28 +166,55 @@ namespace Keepass.Wpf.ViewModels
             }
         }
 
+        private void OpenDatabase()
+        {
+            var openFileDialog = new Microsoft.Win32.OpenFileDialog
+            {
+                Filter = "KeePass Database Files (*.kdbx)|*.kdbx|All Files (*.*)|*.*",
+                Title = "Select KeePass Database"
+            };
+
+            if (openFileDialog.ShowDialog() == true)
+            {
+                // Update config with selected file
+                if (_userConfig == null)
+                {
+                    _userConfig = new UserConfig();
+                }
+
+                _userConfig.LocalDatabasePath = openFileDialog.FileName;
+                SaveUserConfig();
+                UpdateDatabaseFileDisplay();
+                ShowOpenHint = false;
+            }
+        }
+
         private void UpdateDatabaseFileDisplay()
         {
             if (_userConfig == null)
             {
                 DatabaseFileDisplay = "No database configured";
+                ShowOpenHint = true;
                 return;
             }
 
             if (!string.IsNullOrEmpty(_userConfig.LocalDatabasePath))
             {
                 string fileName = System.IO.Path.GetFileName(_userConfig.LocalDatabasePath);
-                DatabaseFileDisplay = $"Local: {fileName}";
+                DatabaseFileDisplay = $"📁 {fileName}";
+                ShowOpenHint = false;
             }
             else if (_userConfig.WebDavConfiguration?.DatabasePath != null)
             {
                 string fileName = System.IO.Path.GetFileName(_userConfig.WebDavConfiguration.DatabasePath);
                 string serverName = ExtractServerName(_userConfig.WebDavConfiguration.Url);
-                DatabaseFileDisplay = $"WebDAV ({serverName}): {fileName}";
+                DatabaseFileDisplay = $"☁ {serverName}: {fileName}";
+                ShowOpenHint = false;
             }
             else
             {
                 DatabaseFileDisplay = "No database file configured";
+                ShowOpenHint = true;
             }
         }
 

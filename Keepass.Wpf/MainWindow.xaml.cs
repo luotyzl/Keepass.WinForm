@@ -87,9 +87,10 @@ public partial class MainWindow : Window
 
     private void MainWindow_Closing(object sender, CancelEventArgs e)
     {
-        e.Cancel = true;
-        Hide();
-        _notifyIcon?.ShowBalloonTip("KeeZ", "Application minimized to tray", BalloonIcon.Info);
+        base.Close();
+        // e.Cancel = true;
+        // Hide();
+        // _notifyIcon?.ShowBalloonTip("KeeZ", "Application minimized to tray", BalloonIcon.Info);
     }
 
     private void RestoreFromTray()
